@@ -97,6 +97,36 @@ export async function updateProfile(name: string, updates: Partial<Pick<ProfileD
     await writeFile(index, JSON.stringify(updated), "utf-8");
 }
 
+export async function renameProfile(oldName: string, newName: string): Promise<void> {
+    const oldPath = join(DB_ROOT, oldName);
+    const newPath = join(DB_ROOT, newName);
+    
+    if (await fileExists(newPath)) {
+        throw new Error(`Profile '${newName}' already exists`);
+    }
+    
+    const profile = await getProfile(oldName);
+    if (!profile) throw new Error(`Profile '${oldName}' not found`);
+    
+    profile.name = newName;
+    profile.updatedAt = new Date().toISOString();
+    
+    await ensureDir(newPath);
+    
+    const index = join(newPath, "index.json");
+    await writeFile(index, JSON.stringify(profile), "utf-8");
+    
+    const oldConvo = join(oldPath, "conversation.json");
+    const newConvo = join(newPath, "conversation.json");
+
+    if (await fileExists(oldConvo)) {
+        const convoData = await readFile(oldConvo, "utf-8");
+        await writeFile(newConvo, convoData, "utf-8");
+    }
+    
+    await rm(oldPath, { recursive: true, force: true });
+}
+
 export async function deleteProfile(name: string): Promise<void> {
     const profile = join(DB_ROOT, name);
     await rm(profile, { recursive: true, force: true });

@@ -6,6 +6,7 @@ import {
     getProfile, 
     createProfile, 
     updateProfile, 
+    renameProfile,
     deleteProfile, 
     clearConversation 
 } from "../utils/profileManager.js";
@@ -73,6 +74,11 @@ export const profile: Command = {
                         .setDescription("Profile name")
                         .setRequired(true)
                         .setAutocomplete(true)
+                )
+                .addStringOption(o => 
+                    o.setName("newname")
+                        .setDescription("New profile name")
+                        .setRequired(false)
                 )
                 .addStringOption(o => 
                     o.setName("prompt")
@@ -227,6 +233,7 @@ export const profile: Command = {
 
         if (sub === "edit") {
             const name = interaction.options.getString("name", true);
+            const inn = interaction.options.getString("newname");
             const promptId = interaction.options.getString("prompt");
             const model = interaction.options.getString("model");
             
@@ -235,23 +242,43 @@ export const profile: Command = {
                 return;
             }
             
-            if (!promptId && !model) {
+            if (!inn && !promptId && !model) {
                 await interaction.editReply("Please specify at least one field to update.");
                 return;
             }
             
             try {
-                const updates: any = {};
+                let final = name;
+                
+                if (inn) {
+                    const newName = sanitizeName(inn);
 
-                if (promptId) updates.promptId = promptId;
-                if (model) updates.model = model;
+                    if (!newName) {
+                        await interaction.editReply("Invalid new profile name.");
+                        return;
+                    }
+                    
+                    if (newName !== name) {
+                        if (await profileExists(newName)) {
+                            await interaction.editReply(`Profile '${newName}' already exists.`);
+                            return;
+                        }
+
+                        await renameProfile(name, newName);
+                        final = newName;
+                    }
+                }
                 
-                await updateProfile(name, updates);
-                const changes = [];
-                if (promptId) changes.push(`Prompt: ${promptId}`);
-                if (model) changes.push(`Model: ${model}`);
-                
-                await interaction.editReply(`Profile '${name}' updated.\n${changes.join("\n")}`);
+                if (promptId || model) {
+                    const updates: any = {};
+
+                    if (promptId) updates.promptId = promptId;
+                    if (model) updates.model = model;
+
+                    await updateProfile(final, updates);
+                }
+
+                await interaction.editReply(`Profile updated successfully.`);
             } catch (err) {
                 console.error("Error updating profile:", err);
                 await interaction.editReply("Failed to update profile.");
