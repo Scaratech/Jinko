@@ -1,4 +1,4 @@
-import type { Command } from "../types/index.ts";
+import type { Command } from "../types/index.js";
 import {
     SlashCommandBuilder,
     InteractionContextType

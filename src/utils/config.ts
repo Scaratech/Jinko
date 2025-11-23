@@ -20,5 +20,5 @@ export const CONFIG: Config = {
         key: String(process.env.OPENROUTER_API_KEY),
         model: String(process.env.OPENROUTER_AI_MODEL) || "mistralai/mixtral-8x7b-instruct"
     },
-    db: String(process.env.DB_PATH) || "db.json"
+    db: String(process.env.DB_PATH) || "db/"
 };

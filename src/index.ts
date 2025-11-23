@@ -1,12 +1,8 @@
 /// TYPE IMPORTS ///
-import type { 
-    Command 
-} from "./types/index.ts";
+import type { Command } from "./types/index.js";
 
 /// COMMAND IMPORTS ///
-import {
-    ping
-} from "./commands/index.ts";
+import { ping, about } from "./commands/index.js";
 
 /// DISCORD.JS IMPORTS ///
 import type { Interaction } from "discord.js";
@@ -16,14 +12,15 @@ import {
 } from "discord.js";
 
 /// OTHER IMPORTS ///
-import { CONFIG } from "./utils/config.ts";
-import { client } from "./utils/client.ts";
+import { CONFIG } from "./utils/config.js";
+import { client } from "./utils/client.js";
 
 console.clear();
 
 // Set commands
 client.commands = new Collection<string, Command>();
 client.commands.set(ping.data.name, ping);
+client.commands.set(about.data.name, about);
 
 client.once(Events.ClientReady, (c) => {
     console.log(`Logged in as ${c.user.tag}`);

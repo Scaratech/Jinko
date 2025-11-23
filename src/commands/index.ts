@@ -1,1 +1,2 @@
-export * from "./ping.ts";
+export * from "./ping.js";
+export * from "./about.js";

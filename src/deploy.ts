@@ -1,11 +1,13 @@
 import { 
-    ping 
-} from "./commands/index.ts";
-import { CONFIG } from "./utils/config.ts";
+    ping,
+    about
+} from "./commands/index.js";
+import { CONFIG } from "./utils/config.js";
 import { REST, Routes } from "discord.js";
 
 const commands = [
-    ping.data.toJSON()
+    ping.data.toJSON(),
+    about.data.toJSON()
 ];
 
 const rest = new REST().setToken(CONFIG.discord.token);
