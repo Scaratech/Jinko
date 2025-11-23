@@ -26,9 +26,9 @@ const pendingConfirmations = new Map<string, {
 
 const CONFIRMATION_TIMEOUT = 60000; // 60 seconds
 
-export const profiles: Command = {
+export const profile: Command = {
     data: new SlashCommandBuilder()
-        .setName("profiles")
+        .setName("profile")
         .setDescription("Manage conversation profiles")
         .addSubcommand(sc => 
             sc.setName("list")

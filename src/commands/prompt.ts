@@ -7,9 +7,9 @@ function sanitizeId(id: string): string {
 	return id.replace(/[^a-zA-Z0-9-_]/g, "").slice(0, 64);
 }
 
-export const prompts: Command = {
+export const prompt: Command = {
 	data: new SlashCommandBuilder()
-		.setName("prompts")
+		.setName("prompt")
 		.setDescription("List or read prompts")
 		.addSubcommand(sc => sc.setName("list").setDescription("List all prompts"))
 		.addSubcommand(sc => sc.setName("read").setDescription("Read a prompt").addStringOption(o => o.setName("id").setDescription("Prompt ID").setRequired(true)))
