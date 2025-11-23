@@ -2,7 +2,7 @@
 import type { Command } from "./types/index.js";
 
 /// COMMAND IMPORTS ///
-import { ping, about, model, prompts, help } from "./commands/index.js";
+import { ping, about, model, prompts, profiles, help } from "./commands/index.js";
 
 /// DISCORD.JS IMPORTS ///
 import type { Interaction } from "discord.js";
@@ -23,6 +23,7 @@ client.commands.set(ping.data.name, ping);
 client.commands.set(about.data.name, about);
 client.commands.set(model.data.name, model);
 client.commands.set(prompts.data.name, prompts);
+client.commands.set(profiles.data.name, profiles);
 client.commands.set(help.data.name, help);
 
 client.once(Events.ClientReady, (c) => {

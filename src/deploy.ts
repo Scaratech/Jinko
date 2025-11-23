@@ -1,4 +1,4 @@
-import { ping, about, model, prompts, help } from "./commands/index.js";
+import { ping, about, model, prompts, profiles, help } from "./commands/index.js";
 import { CONFIG } from "./utils/config.js";
 import { REST, Routes } from "discord.js";
 
@@ -7,6 +7,7 @@ const commands = [
     about.data.toJSON(),
     model.data.toJSON(),
     prompts.data.toJSON(),
+    profiles.data.toJSON(),
     help.data.toJSON()
 ];
 

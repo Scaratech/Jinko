@@ -10,4 +10,5 @@ declare module "discord.js" {
 
 export * from "./Config.js";
 export * from "./DB.js";
+export * from "./Profile.js";
 export { Command };
