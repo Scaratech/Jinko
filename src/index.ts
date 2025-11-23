@@ -2,7 +2,7 @@
 import type { Command } from "./types/index.js";
 
 /// COMMAND IMPORTS ///
-import { ping, about } from "./commands/index.js";
+import { ping, about, model } from "./commands/index.js";
 
 /// DISCORD.JS IMPORTS ///
 import type { Interaction } from "discord.js";
@@ -21,6 +21,7 @@ console.clear();
 client.commands = new Collection<string, Command>();
 client.commands.set(ping.data.name, ping);
 client.commands.set(about.data.name, about);
+client.commands.set(model.data.name, model);
 
 client.once(Events.ClientReady, (c) => {
     console.log(`Logged in as ${c.user.tag}`);
@@ -28,6 +29,17 @@ client.once(Events.ClientReady, (c) => {
 
 // On command
 client.on(Events.InteractionCreate, async (interaction: Interaction) => {
+    // Autocomplete interactions
+    if (interaction.isAutocomplete()) {
+        const command = client.commands.get(interaction.commandName);
+        try {
+            if (command?.autocomplete) await command.autocomplete(interaction);
+        } catch (err) {
+            console.error(`Error during autocomplete for ${interaction.commandName}:`, err);
+        }
+        return;
+    }
+
     if (!interaction.isChatInputCommand()) return;
     const command = client.commands.get(interaction.commandName);
 

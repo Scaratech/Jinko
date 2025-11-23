@@ -1,8 +1,11 @@
+import type { ChatInputCommandInteraction, AutocompleteInteraction } from "discord.js";
+
 export interface Command {
     data: {
         name: string;
         description: string;
         toJSON(): any;
     };
-    execute: (interaction: any) => Promise<void>;
+    execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
+    autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
 };

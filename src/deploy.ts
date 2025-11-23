@@ -1,13 +1,15 @@
 import { 
     ping,
-    about
+    about,
+    model
 } from "./commands/index.js";
 import { CONFIG } from "./utils/config.js";
 import { REST, Routes } from "discord.js";
 
 const commands = [
     ping.data.toJSON(),
-    about.data.toJSON()
+    about.data.toJSON(),
+    model.data.toJSON()
 ];
 
 const rest = new REST().setToken(CONFIG.discord.token);

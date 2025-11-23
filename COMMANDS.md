@@ -15,5 +15,4 @@
 /prompt default prompt:"" - Set default prompt
 
 /setup - Wizzard
-/model model:"" - Set default model
 ```

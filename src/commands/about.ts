@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { SlashCommandBuilder, InteractionContextType } from "discord.js";
 
 const root = join(process.cwd(), CONFIG.db);
-export const profileDB = new DB({ rootDir: root, jsonIndent: 0, autoSave: true });
+const profileDB = new DB({ rootDir: root, jsonIndent: 0, autoSave: true });
 
 async function ensure() {
     await profileDB.init();
