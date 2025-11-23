@@ -1,4 +1,4 @@
-import type { Config } from "../types/index.ts";
+import type { Config } from "../types/index.js";
 import { config } from "dotenv";
 
 config();
@@ -8,18 +8,18 @@ if (
     !process.env.DISCORD_APP_ID ||
     !process.env.OPENROUTER_API_KEY
 ) {
-    throw new Error("Missing required environment variable(s)");
+    throw new Error("Missing required environment variables: DISCORD_BOT_TOKEN, DISCORD_APP_ID, OPENROUTER_API_KEY");
 }
 
 export const CONFIG: Config = {
     discord: {
-        token: String(process.env.DISCORD_BOT_TOKEN),
-        id: String(process.env.DISCORD_APP_ID)
+        token: process.env.DISCORD_BOT_TOKEN,
+        id: process.env.DISCORD_APP_ID
     },
     ai: {
-        key: String(process.env.OPENROUTER_API_KEY),
-        model: String(process.env.OPENROUTER_AI_MODEL) || "mistralai/mixtral-8x7b-instruct"
+        key: process.env.OPENROUTER_API_KEY,
+        model: process.env.OPENROUTER_AI_MODEL || "mistralai/mixtral-8x7b-instruct"
     },
-    db: String(process.env.DB_DIR) || "db/",
-    prompts: String(process.env.PROMPT_DIR) || "prompts/"
+    db: process.env.DB_DIR || "db",
+    prompts: process.env.PROMPT_DIR || "prompts"
 };

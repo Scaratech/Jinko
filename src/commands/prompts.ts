@@ -28,12 +28,11 @@ export const prompts: Command = {
 			const ids = getPromptIds();
 
 			if (!ids.length) {
-				await interaction.editReply("No prompts found");
+				await interaction.editReply("No prompts found.");
 				return;
 			}
 
-			const body = ["**All prompts:**", ...ids.map(i => `- ${i}`)].join("\n");
-
+			const body = ["All prompts:", ...ids.map(i => `- ${i}`)].join("\n");
 			await interaction.editReply(body);
 			return;
 		}
@@ -43,23 +42,22 @@ export const prompts: Command = {
 			const id = sanitizeId(rawId);
 
 			if (!id) {
-				await interaction.editReply("Invalid prompt ID");
+				await interaction.editReply("Invalid prompt ID.");
 				return;
 			}
 
 			const content = getPrompt(id);
 
 			if (content === null) {
-				await interaction.editReply(`Prompt '${id}' not found`);
+				await interaction.editReply(`Prompt '${id}' not found.`);
 				return;
 			}
 
 			const body = content.trim().slice(0, 1900);
-
 			await interaction.editReply(body);
 			return;
 		}
 
-		await interaction.editReply("Unknown subcommand");
+		await interaction.editReply("Unknown subcommand.");
 	}
 };

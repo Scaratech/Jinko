@@ -5,7 +5,7 @@ import type { Command } from "./types/index.js";
 import { ping, about, model, prompts, profiles, help } from "./commands/index.js";
 
 /// DISCORD.JS IMPORTS ///
-import type { Interaction } from "discord.js";
+import type { Interaction, Message } from "discord.js";
 import {
     Collection,
     Events,
@@ -14,6 +14,11 @@ import {
 /// OTHER IMPORTS ///
 import { CONFIG } from "./utils/config.js";
 import { client } from "./utils/client.js";
+import { getActiveProfile } from "./utils/activeProfiles.js";
+import { getProfile, getConversation, addMessage } from "./utils/profileManager.js";
+import { getPrompt } from "./utils/prompts.js";
+import { ensure } from "./utils/profileDB.js";
+import { createChatCompletion, buildSystemPrompt, conversationToMsg } from "./utils/chat.js";
 
 console.clear();
 
@@ -32,14 +37,15 @@ client.once(Events.ClientReady, (c) => {
 
 // On command
 client.on(Events.InteractionCreate, async (interaction: Interaction) => {
-    // Autocomplete interactions
     if (interaction.isAutocomplete()) {
         const command = client.commands.get(interaction.commandName);
+
         try {
             if (command?.autocomplete) await command.autocomplete(interaction);
         } catch (err) {
             console.error(`Error during autocomplete for ${interaction.commandName}:`, err);
         }
+
         return;
     }
 
@@ -67,6 +73,76 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
         } else {
             await interaction.reply(reply);
         }
+    }
+});
+
+// On message
+client.on(Events.MessageCreate, async (message: Message) => {
+    if (message.author.bot) return;
+    if (!message.channel.isDMBased()) return;
+    
+    try {
+        const profile = await getActiveProfile(message.author.id);
+        
+        if (!profile) {
+            await message.reply("No active profile set. Use `/profiles set` to select a profile first.");
+            return;
+        }
+        
+        const data = await getProfile(profile);
+        
+        if (!data) {
+            await message.reply("Failed to load profile data. Please set a valid profile.");
+            return;
+        }
+        
+        const content = getPrompt(data.promptId);
+        
+        if (!content) {
+            await message.reply(`Prompt '${data.promptId}' not found. Please update your profile.`);
+            return;
+        }
+        
+        const db = await ensure();
+        const aboutInfo = db.get<Record<string, any>>("about") || {};
+        const systemPrompt = buildSystemPrompt(content, aboutInfo);
+        const conversation = await getConversation(profile);
+        
+        if (!conversation) {
+            await message.reply("Failed to load conversation history.");
+            return;
+        }
+        
+        await addMessage(profile, "user", message.content);
+        
+        const chatMessages = conversationToMsg(systemPrompt, [
+            ...conversation.messages,
+            { role: "user", content: message.content, timestamp: new Date().toISOString() }
+        ]);
+        
+        if ("sendTyping" in message.channel) {
+            await message.channel.sendTyping();
+        }
+        
+        const aiResponse = await createChatCompletion(data.model, chatMessages);
+        await addMessage(profile, "assistant", aiResponse);
+        
+        if (aiResponse.length <= 2000) {
+            await message.reply(aiResponse);
+        } else {
+            const chunks = aiResponse.match(/[\s\S]{1,2000}/g) || [aiResponse];
+            await message.reply(chunks[0]);
+            
+            for (let i = 1; i < chunks.length; i++) {
+                if ("send" in message.channel) {
+                    await message.channel.send(chunks[i]);
+                }
+            }
+        }
+        
+    } catch (err) {
+        console.error("Error handling message:", err);
+        await message.reply("An error occurred while processing your message. Please try again.");
     }
 });
 

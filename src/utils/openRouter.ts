@@ -1,9 +1,9 @@
 import { CONFIG } from "./config.js";
+import { OpenRouter } from "@openrouter/sdk";
 
-interface OpenRouterModel {
-    id: string;
-    name?: string;
-}
+const openrouter = new OpenRouter({
+    apiKey: CONFIG.ai.key
+});
 
 let cached: string[] = [];
 let lastFetch = 0;
@@ -14,21 +14,16 @@ export async function fetchModels(): Promise<string[]> {
     if (cached.length && (now - lastFetch) < TTL_MS) return cached;
 
     try {
-        const res = await fetch("https://openrouter.ai/api/v1/models", {
-            headers: {
-                "Authorization": `Bearer ${CONFIG.ai.key}`,
-                "Accept": "application/json"
-            }
-        });
-
-        if (!res.ok) throw new Error(`OR models request failed: ${res.status}`);
-
-        const json: any = await res.json();
-        const list: OpenRouterModel[] = Array.isArray(json.data) ? json.data : [];
-
-        cached = list.map(m => m.id).filter(Boolean);
-        lastFetch = now;
-    } catch {
+        const response = await openrouter.models.list();
+        
+        if (response.data && Array.isArray(response.data)) {
+            cached = response.data.map(m => m.id).filter(Boolean);
+            lastFetch = now;
+        } else {
+            throw new Error("Invalid response format");
+        }
+    } catch (err) {
+        console.error("Error fetching models:", err);
         if (!cached.length) cached = [CONFIG.ai.model];
     }
 

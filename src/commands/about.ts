@@ -27,7 +27,6 @@ export const about: Command = {
         await interaction.deferReply({ ephemeral: true });
         const db = await ensure();
 
-        const user = interaction.user;
         const key = "about";
         const fields: Record<string, any> = {};
 
@@ -52,30 +51,31 @@ export const about: Command = {
         }
 
         const profile = db.get<Record<string, any>>(key) || {};
-        const created = `<t:${Math.floor(user.createdTimestamp / 1000)}:R>`;
-        const header = action === "saved" ? "Profile saved" : "Your profile";
-        const lines: string[] = [
-            `${header}`,
-            `User: ${user.tag} (${user.id})`,
-            `Account Created: ${created}`
-        ];
+        
+        if (action === "saved") {
+            await interaction.editReply("Profile saved.");
+            return;
+        }
+
+        if (Object.keys(profile).length === 0) {
+            await interaction.editReply("No profile data saved yet. Use command options to set your info.");
+            return;
+        }
+
+        const lines: string[] = ["Your profile:"];
         const ordered = [
             "name", "pronouns", "gender",
             "age", "location", "sexuality",
             "interests", "likes", "dislikes"
         ] as const;
 
-        for (const key of ordered) {
-            if (key in profile) {
-                lines.push(`${key[0].toUpperCase() + key.slice(1)}: ${profile[key]}`);
+        for (const field of ordered) {
+            if (field in profile) {
+                lines.push(`${field.charAt(0).toUpperCase() + field.slice(1)}: ${profile[field]}`);
             }
         }
 
-        if (Object.keys(profile).length === 0) {
-            lines.push("No profile data saved yet");
-        }
-
-        await interaction.editReply('Profile saved');
+        await interaction.editReply(lines.join("\n"));
     }
 };
 

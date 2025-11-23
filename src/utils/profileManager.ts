@@ -118,3 +118,20 @@ export async function getConversation(name: string): Promise<ConversationData | 
         return null;
     }
 }
+
+export async function addMessage(name: string, role: "user" | "assistant", content: string): Promise<void> {
+    const conversationPath = join(DB_ROOT, name, "conversation.json");
+    const conversation = await getConversation(name);
+    
+    if (!conversation) {
+        throw new Error(`Conversation for profile '${name}' not found`);
+    }
+    
+    conversation.messages.push({
+        role,
+        content,
+        timestamp: new Date().toISOString()
+    });
+    
+    await writeFile(conversationPath, JSON.stringify(conversation, null, 2), "utf-8");
+}

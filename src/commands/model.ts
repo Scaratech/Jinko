@@ -25,9 +25,15 @@ export const model: Command = {
 
         if (model) {
             await db.set(key, model);
+            await interaction.editReply(`Model set to: ${model}`);
+        } else {
+            const current = db.get<string>(key);
+            if (current) {
+                await interaction.editReply(`Current model: ${current}`);
+            } else {
+                await interaction.editReply("No model set. Use the select option to choose one.");
+            }
         }
-
-        await interaction.editReply('Model set');
     },
 
     async autocomplete(interaction: AutocompleteInteraction) {

@@ -11,6 +11,7 @@ import {
 } from "../utils/profileManager.js";
 import { getPromptIds } from "../utils/prompts.js";
 import { searchModels } from "../utils/openRouter.js";
+import { setActiveProfile } from "../utils/activeProfiles.js";
 import { SlashCommandBuilder, InteractionContextType } from "discord.js";
 
 function sanitizeName(name: string): string {
@@ -164,12 +165,12 @@ export const profiles: Command = {
             const profiles = await listProfiles();
             
             if (!profiles.length) {
-                await interaction.editReply("No profiles found, create one with `/profile create`");
+                await interaction.editReply("No profiles found. Create one with `/profiles create`.");
                 return;
             }
             
             const list = profiles.map(name => `- ${name}`).join("\n");
-            await interaction.editReply(`**All profiles:**\n${list}`);
+            await interaction.editReply(`All profiles:\n${list}`);
 
             return;
         }
@@ -181,21 +182,21 @@ export const profiles: Command = {
             const model = interaction.options.getString("model", true);
             
             if (!name) {
-                await interaction.editReply("Invalid profile name");
+                await interaction.editReply("Invalid profile name.");
                 return;
             }
             
             if (await profileExists(name)) {
-                await interaction.editReply(`Profile '${name}' already exists`);
+                await interaction.editReply(`Profile '${name}' already exists.`);
                 return;
             }
             
             try {
                 await createProfile(name, promptId, model);
-                await interaction.editReply(`Profile '${name}' created successfully!`);
+                await interaction.editReply(`Profile '${name}' created successfully.`);
             } catch (err) {
                 console.error("Error creating profile:", err);
-                await interaction.editReply("Failed to create profile");
+                await interaction.editReply("Failed to create profile.");
             }
 
             return;
@@ -205,7 +206,7 @@ export const profiles: Command = {
             const name = interaction.options.getString("name", true);
             
             if (!(await profileExists(name))) {
-                await interaction.editReply(`Profile '${name}' not found`);
+                await interaction.editReply(`Profile '${name}' not found.`);
                 return;
             }
             
@@ -216,9 +217,9 @@ export const profiles: Command = {
             });
             
             await interaction.editReply(
-                `**Delete profile '${name}'?**\n` +
-                `This will permanently delete all data\n\n` +
-                `Run \`/profile confirm\` within 60 seconds to proceed`
+                `Delete profile '${name}'?\n` +
+                `This will permanently delete all data.\n\n` +
+                `Run \`/profiles confirm\` within 60 seconds to proceed.`
             );
 
             return;
@@ -230,12 +231,12 @@ export const profiles: Command = {
             const model = interaction.options.getString("model");
             
             if (!(await profileExists(name))) {
-                await interaction.editReply(`Profile '${name}' not found`);
+                await interaction.editReply(`Profile '${name}' not found.`);
                 return;
             }
             
             if (!promptId && !model) {
-                await interaction.editReply("Please specify at least one field to update");
+                await interaction.editReply("Please specify at least one field to update.");
                 return;
             }
             
@@ -247,14 +248,13 @@ export const profiles: Command = {
                 
                 await updateProfile(name, updates);
                 const changes = [];
-
-                if (promptId) changes.push(`prompt -> ${promptId}`);
-                if (model) changes.push(`model -> ${model}`);
+                if (promptId) changes.push(`Prompt: ${promptId}`);
+                if (model) changes.push(`Model: ${model}`);
                 
-                await interaction.editReply(`Profile '${name}' updated:\n${changes.join("\n")}`);
+                await interaction.editReply(`Profile '${name}' updated.\n${changes.join("\n")}`);
             } catch (err) {
                 console.error("Error updating profile:", err);
-                await interaction.editReply("Failed to update profile");
+                await interaction.editReply("Failed to update profile.");
             }
 
             return;
@@ -275,9 +275,9 @@ export const profiles: Command = {
             });
             
             await interaction.editReply(
-                `**Clear conversation history for '${name}'?**\n` +
-                `This cannot be undone\n\n` +
-                `Run \`/profile confirm\` within 60 seconds to proceed`
+                `Clear conversation history for '${name}'?\n` +
+                `This cannot be undone.\n\n` +
+                `Run \`/profiles confirm\` within 60 seconds to proceed.`
             );
 
             return;
@@ -287,21 +287,23 @@ export const profiles: Command = {
             const name = interaction.options.getString("name", true);
             
             if (!(await profileExists(name))) {
-                await interaction.editReply(`Profile '${name}' not found`);
+                await interaction.editReply(`Profile '${name}' not found.`);
                 return;
             }
             
             const profileData = await getProfile(name);
 
             if (!profileData) {
-                await interaction.editReply("Failed to load profile data");
+                await interaction.editReply("Failed to load profile data.");
                 return;
             }
             
+            await setActiveProfile(interaction.user.id, name);
+            
             await interaction.editReply(
-                `Switched to profile '${name}'\n` +
-                `**Prompt:** ${profileData.promptId}\n` +
-                `**Model:** ${profileData.model}`
+                `Switched to profile '${name}'.\n` +
+                `Prompt: ${profileData.promptId}\n` +
+                `Model: ${profileData.model}`
             );
 
             return;
@@ -311,34 +313,33 @@ export const profiles: Command = {
             const pending = pendingConfirmations.get(interaction.user.id);
             
             if (!pending) {
-                await interaction.editReply("No pending confirmation");
+                await interaction.editReply("No pending confirmation.");
                 return;
             }
             
             if (Date.now() - pending.timestamp > CONFIRMATION_TIMEOUT) {
                 pendingConfirmations.delete(interaction.user.id);
-                await interaction.editReply("Confirmation expired, please try again");
-
+                await interaction.editReply("Confirmation expired. Please try again.");
                 return;
             }
             
             try {
                 if (pending.action === "remove") {
                     await deleteProfile(pending.target);
-                    await interaction.editReply(`Profile '${pending.target}' deleted`);
+                    await interaction.editReply(`Profile '${pending.target}' deleted.`);
                 } else if (pending.action === "clear") {
                     await clearConversation(pending.target);
-                    await interaction.editReply(`Conversation history for '${pending.target}' cleared`);
+                    await interaction.editReply(`Conversation history for '${pending.target}' cleared.`);
                 }
                 
                 pendingConfirmations.delete(interaction.user.id);
             } catch (err) {
                 console.error(`Error confirming ${pending.action}:`, err);
-                await interaction.editReply("Failed to complete the action");
+                await interaction.editReply("Failed to complete the action.");
             }
             return;
         }
 
-        await interaction.editReply("Unknown subcommand");
+        await interaction.editReply("Unknown subcommand.");
     }
 };

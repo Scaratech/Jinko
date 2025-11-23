@@ -1,12 +1,12 @@
 export interface Config {
     discord: {
         token: string;
-        id: string
+        id: string;
     };
     ai: {
         key: string;
-        model?: string;
+        model: string;
     };
     db: string;
-    prompts: string
-};
+    prompts: string;
+}
