@@ -67,6 +67,10 @@ export function buildSystemPrompt(content: string, about: Record<string, any>): 
                 systemPrompt += `${field.charAt(0).toUpperCase() + field.slice(1)}: ${about[field]}\n`;
             }
         }
+        
+        if (about.age) {
+            systemPrompt += `\nNote: You are the same age as the user (${about.age}).\n`;
+        }
     }
     
     return systemPrompt;

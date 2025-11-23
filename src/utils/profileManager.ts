@@ -76,11 +76,11 @@ export async function createProfile(name: string, promptId: string, model: strin
     };
     
     const index = join(profile, "index.json");
-    await writeFile(index, JSON.stringify(profileData, null, 2), "utf-8");
+    await writeFile(index, JSON.stringify(profileData), "utf-8");
     
     const conversationData: ConversationData = { messages: [] };
     const conversationPath = join(profile, "conversation.json");
-    await writeFile(conversationPath, JSON.stringify(conversationData, null, 2), "utf-8");
+    await writeFile(conversationPath, JSON.stringify(conversationData), "utf-8");
 }
 
 export async function updateProfile(name: string, updates: Partial<Pick<ProfileData, "promptId" | "model">>): Promise<void> {
@@ -94,7 +94,7 @@ export async function updateProfile(name: string, updates: Partial<Pick<ProfileD
     };
     
     const index = join(DB_ROOT, name, "index.json");
-    await writeFile(index, JSON.stringify(updated, null, 2), "utf-8");
+    await writeFile(index, JSON.stringify(updated), "utf-8");
 }
 
 export async function deleteProfile(name: string): Promise<void> {
@@ -105,7 +105,7 @@ export async function deleteProfile(name: string): Promise<void> {
 export async function clearConversation(name: string): Promise<void> {
     const conversationPath = join(DB_ROOT, name, "conversation.json");
     const conversationData: ConversationData = { messages: [] };
-    await writeFile(conversationPath, JSON.stringify(conversationData, null, 2), "utf-8");
+    await writeFile(conversationPath, JSON.stringify(conversationData), "utf-8");
 }
 
 export async function getConversation(name: string): Promise<ConversationData | null> {
@@ -133,5 +133,5 @@ export async function addMessage(name: string, role: "user" | "assistant", conte
         timestamp: new Date().toISOString()
     });
     
-    await writeFile(conversationPath, JSON.stringify(conversation, null, 2), "utf-8");
+    await writeFile(conversationPath, JSON.stringify(conversation), "utf-8");
 }
