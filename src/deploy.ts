@@ -1,7 +1,8 @@
 import { 
     ping,
     about,
-    model
+    model,
+    prompts
 } from "./commands/index.js";
 import { CONFIG } from "./utils/config.js";
 import { REST, Routes } from "discord.js";
@@ -9,7 +10,8 @@ import { REST, Routes } from "discord.js";
 const commands = [
     ping.data.toJSON(),
     about.data.toJSON(),
-    model.data.toJSON()
+    model.data.toJSON(),
+    prompts.data.toJSON()
 ];
 
 const rest = new REST().setToken(CONFIG.discord.token);

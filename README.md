@@ -43,13 +43,20 @@ DISCORD_APP_ID=your_app/client_id
 OPENROUTER_API_KEY=your_openrouter_api_key
 
 ### OTHER ###
-DB_PATH=./db.json # Path to DB
+DB_DIR=./db.json # Path to DB
+PROMPT_DIR=./prompts/ # Path to prompts
 ```
 Then, run
 ```sh
 $ pnpm run deploy
 $ pnpm start
 ```
+
+### Prompts
+You need to supply your own prompts
+1. Create the directory you have for `PROMPT_DIR` (e.g. `prompts`)
+2. Create a text file (e.g. `prompt.txt`)
+    - Input your prompt
 
 ### Discord Setup
 1. Once you've confirmed the bot is up and running, and that you have it added, run the `/ping` command

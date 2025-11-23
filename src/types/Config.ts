@@ -8,4 +8,5 @@ export interface Config {
         model?: string;
     };
     db: string;
+    prompts: string
 };

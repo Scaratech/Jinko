@@ -1,17 +1,7 @@
 import type { Command } from "../types/index.js";
 import type { ChatInputCommandInteraction } from "discord.js";
-import { CONFIG } from "../utils/config.js";
-import { DB } from "../utils/DB.js";
-import { join } from "node:path";
+import { ensure } from "../utils/profileDB.js";
 import { SlashCommandBuilder, InteractionContextType } from "discord.js";
-
-const root = join(process.cwd(), CONFIG.db);
-const profileDB = new DB({ rootDir: root, jsonIndent: 0, autoSave: true });
-
-async function ensure() {
-    await profileDB.init();
-    return profileDB;
-}
 
 export const about: Command = {
     data: new SlashCommandBuilder()
