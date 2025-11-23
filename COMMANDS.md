@@ -5,7 +5,5 @@
 /profile edit name:"" promptId:"" - Edit system prompt of a profile
 /profile edit name:"" model:"" - Edit model of a profile
 /profile clear name:"" - Clear message history (Requries verification)
-/profile swap name:"" - Swap to a profile
-
-/setup - Wizzard
+/profile set name:"" - Swap to a profile
 ```

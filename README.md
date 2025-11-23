@@ -60,4 +60,4 @@ You need to supply your own prompts
 
 ### Discord Setup
 1. Once you've confirmed the bot is up and running, and that you have it added, run the `/ping` command
-2. Then, click on the bots profile and click the message bot. Then, inside the bots DMs, run `/setup` to get started!
+2. Then, click on the bots profile and click the message bot. Then, inside the bots DMs, run `/help` to get started!
